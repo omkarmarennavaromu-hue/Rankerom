@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Ranker AI — Force Performance, Not Passive Learning</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0a0c10;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #ededee;
+      scroll-behavior: smooth;
+      line-height: 1.5;
+    }
+
+    /* Glassmorphism & premium background */
+    .glass-panel, .navbar, .card, .feature-card, .dashboard-section, .chat-container, .exam-panel, .image-panel, .youtube-panel {
+      background: rgba(18, 22, 28, 0.7);
+      backdrop-filter: blur(14px);
+      border-radius: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .navbar {
+      position: sticky;
+      top: 1rem;
+      margin: 1rem 2rem;
+      padding: 0.8rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+      background: rgba(10, 12, 16, 0.8);
+      border-radius: 3rem;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.6rem;
+      background: linear-gradient(135deg, #FFFFFF, #A0AEC0);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: #e2e8f0;
+      text-decoration: none;
+      font-weight: 500;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+
+    .nav-links a:hover {
+      color: white;
+      text-shadow: 0 0 6px rgba(255,255,255,0.3);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 0.5rem 1.4rem;
+      border-radius: 2rem;
+      font-weight: 500;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+
+    .btn-outline:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: white;
+    }
+
+    .btn-primary {
+      background: linear-gradient(105deg, #ffffff 0%, #cbd5e1 100%);
+      border: none;
+      padding: 0.7rem 1.8rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      color: #0a0c10;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.02);
+      background: linear-gradient(105deg, #f0f0f0, #ffffff);
+    }
+
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 6rem 1rem 5rem;
+    }
+
+    .hero h1 {
+      font-size: 4rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #FFFFFF, #94a3b8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      font-size: 1.3rem;
+      color: #9ca3af;
+      margin: 1.5rem 0;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 2rem;
+      margin: 4rem 0;
+    }
+
+    .feature-card {
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255,255,255,0.2);
+      background: rgba(30, 34, 42, 0.8);
+    }
+
+    .about-section {
+      margin: 5rem 0;
+      padding: 3rem;
+      border-radius: 2rem;
+      background: rgba(15, 18, 24, 0.6);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .dashboard {
+      margin: 3rem 0;
+    }
+
+    .tab-bar {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 0.8rem;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: #cbd5e1;
+      font-weight: 600;
+      padding: 0.7rem 1.8rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 1rem;
+    }
+
+    .tab-btn.active {
+      background: rgba(255,255,255,0.15);
+      color: white;
+      backdrop-filter: blur(4px);
+    }
+
+    .tab-pane {
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .tab-pane.active-pane {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+
+    input, select, textarea, .upload-area {
+      background: #11151c;
+      border: 1px solid #2d3748;
+      border-radius: 1.2rem;
+      padding: 0.9rem 1.2rem;
+      color: white;
+      font-size: 1rem;
+      width: 100%;
+      transition: 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #6c86a3;
+    }
+
+    button {
+      font-weight: 600;
+    }
+
+    .chat-messages {
+      background: rgba(0,0,0,0.3);
+      border-radius: 1.5rem;
+      padding: 1rem;
+      height: 320px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+    }
+
+    .message {
+      margin: 1rem 0;
+      padding: 0.8rem 1rem;
+      border-radius: 1.2rem;
+      max-width: 85%;
+    }
+
+    .user-msg {
+      background: #1e2a3a;
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .ai-msg {
+      background: #2d3748;
+    }
+
+    .exam-question {
+      background: #11151c;
+      padding: 1rem;
+      border-radius: 1rem;
+      margin: 1rem 0;
+    }
+
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    .image-preview {
+      margin-top: 1rem;
+      background: #00000040;
+      border-radius: 1rem;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .image-preview img {
+      max-width: 100%;
+      border-radius: 1rem;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    footer {
+      text-align: center;
+      padding: 3rem;
+      color: #5b677b;
+    }
+
+    @media (max-width: 768px) {
+      .navbar { margin: 1rem; padding: 0.6rem 1rem; }
+      .hero h1 { font-size: 2.6rem; }
+      .grid-2col { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="logo">Ranker AI</div>
+  <div class="nav-links">
+    <a onclick="scrollToSection('home')">Home</a>
+    <a onclick="scrollToSection('about')">About</a>
+    <a onclick="openDashboard()">Explore AI</a>
+  </div>
+</nav>
+
+<main id="home">
+  <div class="container">
+    <div class="hero">
+      <h1>Stop Studying.<br>Start Ranking.</h1>
+      <p>AI that forces performance, not passive learning</p>
+      <button class="btn-primary" onclick="openDashboard()">Explore AI</button>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">📘 Exam Mode — JEE | NDA | KCET adaptive drills</div>
+      <div class="feature-card">💬 AI Chat — instant doubt solver, strict tone</div>
+      <div class="feature-card">🎨 Image AI — Generate & Analyse visuals</div>
+      <div class="feature-card">🎥 YouTube Analyzer — 2-min smart summary</div>
+    </div>
+
+    <div id="about" class="about-section">
+      <h2 style="font-size: 2rem;">About Ranker AI</h2>
+      <p style="margin: 1rem 0 0.5rem;">Built for Indian students preparing for JEE, NDA, KCET — designed to evaluate, not motivate.</p>
+      <p><strong>Creator:</strong> Omkar · Student + Developer<br>
+      <strong>Vision:</strong> Build AI that improves rank, not just answers.</p>
+      <p style="font-weight: 500; margin-top: 1rem;">“This AI evaluates you. It doesn’t motivate you.”</p>
+    </div>
+
+    <!-- DASHBOARD SECTION -->
+    <div id="dashboard" class="dashboard" style="display: none;">
+      <div class="glass-panel" style="padding: 1.5rem;">
+        <div class="tab-bar">
+          <button class="tab-btn active" data-tab="chatTab">💬 AI Chat</button>
+          <button class="tab-btn" data-tab="examTab">🧪 Exam Mode</button>
+          <button class="tab-btn" data-tab="imageTab">🖼️ Image AI</button>
+          <button class="tab-btn" data-tab="youtubeTab">🎥 YouTube Analyzer</button>
+        </div>
+
+        <!-- AI CHAT -->
+        <div id="chatTab" class="tab-pane active-pane">
+          <div class="chat-container" style="padding: 1rem;">
+            <div class="chat-messages" id="chatMessages"></div>
+            <div style="display: flex; gap: 0.8rem;">
+              <input type="text" id="chatInput" placeholder="Ask any JEE/NDA/KCET doubt... strict evaluation" style="flex:1;">
+              <button class="btn-primary" id="sendChatBtn">Send</button>
+              <button class="btn-outline" id="newChatBtn">New Chat</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- EXAM MODE -->
+        <div id="examTab" class="tab-pane">
+          <div class="exam-panel" style="padding: 1rem;">
+            <select id="examType" style="width: auto; margin-right: 1rem;">
+              <option value="JEE">JEE (Main/Advanced)</option>
+              <option value="NDA">NDA</option>
+              <option value="KCET">KCET</option>
+            </select>
+            <button class="btn-primary" id="startExamBtn">Start Test</button>
+            <div id="examQuestionsArea" style="margin-top: 2rem;"></div>
+            <div id="examResult" style="margin-top: 1rem;"></div>
+          </div>
+        </div>
+
+        <!-- IMAGE AI (Generation + Analysis) -->
+        <div id="imageTab" class="tab-pane">
+          <div class="grid-2col">
+            <div class="image-panel glass-panel" style="padding:1.2rem;">
+              <h3>✨ Image Generation</h3>
+              <input type="text" id="genPrompt" placeholder="Describe an image (e.g., Physics diagram: projectile motion)" style="margin: 1rem 0;">
+              <button class="btn-primary" id="generateImageBtn">Generate</button>
+              <div id="generatedImageDiv" class="image-preview"></div>
+            </div>
+            <div class="image-panel glass-panel" style="padding:1.2rem;">
+              <h3>🔍 Image Analysis</h3>
+              <input type="file" id="imageUpload" accept="image/*">
+              <div id="uploadPreview" class="image-preview" style="margin-top: 0.5rem;"></div>
+              <button class="btn-primary" id="analyzeImageBtn" style="margin-top: 1rem;">Analyze with AI</button>
+              <div id="analysisResult" style="margin-top: 1rem; font-size: 0.9rem;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- YOUTUBE ANALYZER -->
+        <div id="youtubeTab" class="tab-pane">
+          <div class="youtube-panel" style="padding:1.2rem;">
+            <input type="text" id="youtubeUrl" placeholder="Paste YouTube link (JEE/NDA concept video)">
+            <button class="btn-primary" id="analyzeYoutubeBtn" style="margin-top: 1rem;">Explain Simply</button>
+            <div id="youtubeResult" style="margin-top: 1.5rem; background:#11151c; border-radius:1rem; padding:1rem;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer>Ranker AI · Built for Indian aspirants · Force performance.</footer>
+</main>
+
+<script>
+  // Global state
+  let currentChatHistory = []; // store {role, content}
+  let currentExamQuestions = [];
+  let userAnswers = [];
+
+  // DOM ready
+  document.addEventListener('DOMContentLoaded', () => {
+    // Load chat from localStorage
+    const stored = localStorage.getItem('ranker_chat_history');
+    if(stored) {
+      currentChatHistory = JSON.parse(stored);
+      renderChatMessages();
+    } else {
+      currentChatHistory = [{role: 'assistant', content: 'I am Ranker AI. Ask doubts. No motivation. Direct answers for JEE/NDA/KCET.'}];
+      saveChat();
+      renderChatMessages();
+    }
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const tabId = btn.getAttribute('data-tab');
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active-pane'));
+        document.getElementById(tabId).classList.add('active-pane');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // Chat handlers
+    document.getElementById('sendChatBtn').addEventListener('click', sendChatMessage);
+    document.getElementById('newChatBtn').addEventListener('click', () => {
+      currentChatHistory = [{role: 'assistant', content: 'New session. I evaluate strictly. Ask any exam question.'}];
+      saveChat();
+      renderChatMessages();
+    });
+    document.getElementById('chatInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') sendChatMessage(); });
+
+    // Exam
+    document.getElementById('startExamBtn').addEventListener('click', startExam);
+    // Image Gen & Analysis
+    document.getElementById('generateImageBtn').addEventListener('click', generateImage);
+    document.getElementById('analyzeImageBtn').addEventListener('click', analyzeImage);
+    document.getElementById('imageUpload').addEventListener('change', previewImage);
+    document.getElementById('analyzeYoutubeBtn').addEventListener('click', analyzeYoutube);
+  });
+
+  function scrollToSection(id) { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }); }
+  function openDashboard() {
+    const dash = document.getElementById('dashboard');
+    if(dash.style.display === 'none' || !dash.style.display) {
+      dash.style.display = 'block';
+      document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth' });
+    } else {
+      dash.style.display = 'block';
+      document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  async function sendChatMessage() {
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim();
+    if(!msg) return;
+    input.value = '';
+    currentChatHistory.push({role: 'user', content: msg});
+    renderChatMessages();
+    const responseDiv = document.querySelector('#chatMessages');
+    const loadingMsg = document.createElement('div');
+    loadingMsg.className = 'message ai-msg';
+    loadingMsg.innerHTML = '<div class="loading-spinner"></div> Thinking...';
+    responseDiv.appendChild(loadingMsg);
+    responseDiv.scrollTop = responseDiv.scrollHeight;
+
+    try {
+      const res = await fetch('/api/chat.js', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ type: 'chat', messages: currentChatHistory })
+      });
+      const data = await res.json();
+      loadingMsg.remove();
+      const aiText = data.reply || "No response";
+      currentChatHistory.push({role: 'assistant', content: aiText});
+      saveChat();
+      renderChatMessages();
+    } catch(err) {
+      loadingMsg.remove();
+      currentChatHistory.push({role: 'assistant', content: "Error connecting AI. Check API."});
+      renderChatMessages();
+    }
+  }
+
+  function renderChatMessages() {
+    const container = document.getElementById('chatMessages');
+    container.innerHTML = '';
+    for(let msg of currentChatHistory) {
+      const div = document.createElement('div');
+      div.className = `message ${msg.role === 'user' ? 'user-msg' : 'ai-msg'}`;
+      div.innerText = msg.content;
+      container.appendChild(div);
+    }
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function saveChat() { localStorage.setItem('ranker_chat_history', JSON.stringify(currentChatHistory)); }
+
+  // EXAM MODE: generate 5 MCQs
+  async function startExam() {
+    const examType = document.getElementById('examType').value;
+    const area = document.getElementById('examQuestionsArea');
+    area.innerHTML = '<div class="loading-spinner"></div> Generating questions...';
+    document.getElementById('examResult').innerHTML = '';
+    try {
+      const res = await fetch('/api/chat.js', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ type: 'generate_exam', exam: examType })
+      });
+      const data = await res.json();
+      if(data.questions && Array.isArray(data.questions)) {
+        currentExamQuestions = data.questions;
+        userAnswers = new Array(currentExamQuestions.length).fill('');
+        renderExamForm();
+      } else {
+        area.innerHTML = '<p>Error generating exam. Fallback questions.</p>';
+        // fallback sample
+        currentExamQuestions = [
+          { text: `Q1: Which of the following is a vector quantity? (${examType})`, options: ["Mass", "Speed", "Velocity", "Distance"] },
+          { text: `Q2: Value of g at center of earth? (${examType})`, options: ["0", "9.8", "∞", "4.9"] },
+          { text: `Q3: Who wrote "Discovery of India"?`, options: ["Nehru", "Gandhi", "Tagore", "Ambedkar"] },
+          { text: `Q4: SI unit of electric current?`, options: ["Volt", "Ampere", "Ohm", "Watt"] },
+          { text: `Q5: Which element has atomic number 6?`, options: ["Oxygen", "Carbon", "Nitrogen", "Hydrogen"] }
+        ];
+        userAnswers = new Array(5).fill('');
+        renderExamForm();
+      }
+    } catch(e) {
+      area.innerHTML = '<p>Network error, please try again.</p>';
+    }
+  }
+
+  function renderExamForm() {
+    const container = document.getElementById('examQuestionsArea');
+    container.innerHTML = '';
+    currentExamQuestions.forEach((q, idx) => {
+      const qDiv = document.createElement('div');
+      qDiv.className = 'exam-question';
+      qDiv.innerHTML = `<strong>${q.text}</strong><br>`;
+      if(q.options && Array.isArray(q.options)) {
+        q.options.forEach(opt => {
+          const radio = document.createElement('input');
+          radio.type = 'radio';
+          radio.name = `q_${idx}`;
+          radio.value = opt;
+          radio.addEventListener('change', (e) => { userAnswers[idx] = e.target.value; });
+          qDiv.appendChild(radio);
+          qDiv.appendChild(document.createTextNode(' ' + opt + '  '));
+        });
+      } else {
+        const inp = document.createElement('input');
+        inp.placeholder = "Type answer";
+        inp.style.width = '100%';
+        inp.addEventListener('input', (e) => { userAnswers[idx] = e.target.value; });
+        qDiv.appendChild(inp);
+      }
+      container.appendChild(qDiv);
+    });
+    const submitBtn = document.createElement('button');
+    submitBtn.innerText = 'Submit Exam';
+    submitBtn.className = 'btn-primary';
+    submitBtn.style.marginTop = '1rem';
+    submitBtn.onclick = evaluateExam;
+    container.appendChild(submitBtn);
+  }
+
+  async function evaluateExam() {
+    const examType = document.getElementById('examType').value;
+    const answersForEval = userAnswers.map((ans, i) => ({ question: currentExamQuestions[i].text, answer: ans || '(blank)' }));
+    const resultDiv = document.getElementById('examResult');
+    resultDiv.innerHTML = '<div class="loading-spinner"></div> Evaluating...';
+    try {
+      const res = await fetch('/api/chat.js', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ type: 'evaluate_exam', exam: examType, qa_pairs: answersForEval })
+      });
+      const data = await res.json();
+      resultDiv.innerHTML = `<div style="background:#1f2a3a; border-radius:1rem; padding:1rem;"><strong>📊 Score / Accuracy:</strong> ${data.score || 'N/A'}<br><strong>Weak Area:</strong> ${data.weak_area || 'Review needed'}<br><strong>Feedback:</strong> ${data.feedback || 'Focus on fundamentals'}</div>`;
+    } catch(e) { resultDiv.innerHTML = '<p>Evaluation error.</p>'; }
+  }
+
+  // IMAGE GENERATION using OpenRouter
+  async function generateImage() {
+    const prompt = document.getElementById('genPrompt').value.trim();
+    if(!prompt) return;
+    const imgDiv = document.getElementById('generatedImageDiv');
+    imgDiv.innerHTML = '<div class="loading-spinner"></div> Generating visual...';
+    try {
+      const res = await fetch('/api/chat.js', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ type: 'image_generation', prompt: prompt })
+      });
+      const data = await res.json();
+      if(data.imageUrl) {
+        imgDiv.innerHTML = `<img src="${data.imageUrl}" alt="generated" style="max-width:100%; border-radius:1rem;">`;
+      } else {
+        imgDiv.innerHTML = `<p>⚠️ Could not generate. Demo: <img src="https://picsum.photos/id/1/300/200" style="border-radius:1rem; width:100%"></p>`;
+      }
+    } catch(e) { imgDiv.innerHTML = '<p>Generation failed. API issue.</p>'; }
+  }
+
+  function previewImage(e) {
+    const file = e.target.files[0];
+    if(file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const preview = document.getElementById('uploadPreview');
+        preview.innerHTML = `<img src="${ev.target.result}" style="max-width:100%; max-height:180px; border-radius:0.8rem;">`;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  async function analyzeImage() {
+    const fileInput = document.getElementById('imageUpload');
+    if(!fileInput.files.length) { alert('Upload an image first'); return; }
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      const base64 = reader.result.split(',')[1];
+      const resultDiv = document.getElementById('analysisResult');
+      resultDiv.innerHTML = '<div class="loading-spinner"></div> AI is analyzing image...';
+      try {
+        const res = await fetch('/api/chat.js', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ type: 'image_analysis', imageBase64: base64 })
+        });
+        const data = await res.json();
+        resultDiv.innerHTML = `<strong>🔬 Analysis:</strong><br>${data.explanation || 'Image recognized as educational diagram. Review details.'}`;
+      } catch(e) { resultDiv.innerHTML = '<p>Analysis error.</p>'; }
+    };
+  }
+
+  async function analyzeYoutube() {
+    const url = document.getElementById('youtubeUrl').value.trim();
+    if(!url) { alert('Enter YouTube link'); return; }
+    const resDiv = document.getElementById('youtubeResult');
+    resDiv.innerHTML = '<div class="loading-spinner"></div> Summarizing video content...';
+    try {
+      const res = await fetch('/api/chat.js', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ type: 'youtube', url: url })
+      });
+      const data = await res.json();
+      resDiv.innerHTML = `<strong>🎯 Simplified Explanation:</strong><br>${data.summary || 'Focus on core concepts for JEE/NDA/KCET. Keep practicing.'}`;
+    } catch(e) { resDiv.innerHTML = '<p>Failed to fetch YouTube analysis.</p>'; }
+  }
+</script>
+</body>
+</html>
